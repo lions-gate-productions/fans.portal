@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Lions Gate Fan Portal</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron&display=swap');
+  body {
+    margin: 0; font-family: 'Orbitron', monospace;
+    background: #111;
+    color: #eee;
+    overflow-x: hidden;
+  }
+  .glass-panel {
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(12px);
+    border-radius: 15px;
+    border: 1px solid rgba(255,255,255,0.1);
+    padding: 20px;
+    margin: 10px auto;
+    max-width: 900px;
+  }
+  header {
+    position: relative;
+    text-align: center;
+    padding: 15px;
+    background: linear-gradient(90deg, #0ff, #08f);
+    color: #fff;
+    user-select: none;
+    cursor: pointer;
+    font-size: 2rem;
+    letter-spacing: 3px;
+    font-weight: 700;
+    text-shadow: 0 0 8px #0ff, 0 0 12px #0ff;
+  }
+  header span.logo-glow {
+    text-shadow: 0 0 20px #0ff, 0 0 30px #0ff, 0 0 40px #0ff;
+    color: #0ff;
+  }
+  .hidden {display:none;}
+  button {
+    background: #0ff;
+    border: none;
+    padding: 10px 20px;
+    color: #111;
+    font-weight: 700;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 10px;
+  }
+  button:hover {
+    background: #08f;
+    color: #fff;
+  }
+  input[type=text], input[type=password], input[type=file] {
+    width: 100%;
+    padding: 8px 10px;
+    margin: 6px 0 12px 0;
+    border-radius: 6px;
+    border: none;
+    outline: none;
+  }
+  label {
+    font-weight: 600;
+  }
+  .xp-bar {
+    background: rgba(255,255,255,0.1);
+    border-radius: 20px;
+    overflow: hidden;
+    width: 100%;
+    height: 24px;
+    margin: 10px 0;
+  }
+  .xp-progress {
+    height: 100%;
+    background: linear-gradient(90deg, #00fff7, #0088ff);
+    width: 0%;
+    transition: width 0.5s ease;
+    box-shadow: 0 0 10px #0ff;
+    animation: glowXP 3s ease-in-out infinite alternate;
+  }
+  @keyframes glowXP {
+    0% { box-shadow: 0 0 5px #0ff; }
+    100% { box-shadow: 0 0 15px #0ff; }
+  }
+  .badge {
+    display: inline-block;
+    background: #0ff;
+    color: #111;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 12px;
+    margin-right: 8px;
+    text-shadow: 0 0 5px #0ff;
+    user-select: none;
+  }
+  .chat-room {
+    max-height: 300px;
+    overflow-y: auto;
+    border: 1px solid #0ff;
+    padding: 10px;
+    border-radius: 12px;
+    background: rgba(0,0,0,0.4);
+  }
+  .chat-message {
+    margin-bottom: 10px;
+  }
+  .chat-message strong {
+    color: #0ff;
+  }
+  .membership-card {
+    background: linear-gradient(135deg, #00f0ff, #0080ff);
+    border-radius: 20px;
+    padding: 20px;
+    color: #222;
+    max-width: 350px;
+    box-shadow: 0 0 20px #0ff inset;
+    font-weight: 700;
+    user-select: none;
+    position: relative;
+  }
+  .membership-card h2 {
+    margin-top: 0;
+    text-align: center;
+    text-shadow: 0 0 10px #00f0ff;
+  }
+  .membership-card .id-number {
+    letter-spacing: 3px;
+    margin: 10px 0;
+    font-size: 1.2rem;
+    text-align: center;
+    text-shadow: 0 0 8px #0ff;
+  }
+  .membership-card img {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    border: 3px solid #0ff;
+    display: block;
+    margin: 10px auto;
+    object-fit: cover;
+    box-shadow: 0 0 12px #0ff;
+  }
+  .membership-card .stamp {
+    position: absolute;
+    top: 10px; right: 10px;
+    width: 80px;
+    opacity: 0.3;
+    filter: drop-shadow(0 0 5px cyan);
+    animation: pulseStamp 4s ease-in-out infinite;
+  }
+  @keyframes pulseStamp {
+    0%, 100% {opacity: 0.3;}
+    50% {opacity: 0.7;}
+  }
+  .qr-code {
+    margin: 10px auto 0;
+    display: block;
+    width: 100px;
+    height: 100px;
+  }
+  /* Simple modal */
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.75);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+  }
+  .modal {
+    background: #111;
+    border-radius: 12px;
+    padding: 20px;
+    max-width: 400px;
+    width: 90%;
+    box-shadow: 0 0 15px #0ff;
+    color: #0ff;
+  }
+  .mode-toggle {
+    position: fixed;
+    top: 15px; right: 15px;
+    background: none;
+    border: 2px solid #0ff;
+    border-radius: 12px;
+    color: #0ff;
+    cursor: pointer;
+    font-weight: 700;
+    padding: 8px 12px;
+    user-select: none;
+    z-index: 1000;
+  }
+  .voice-status {
+    position: fixed;
+    bottom: 10px; left: 10px;
+    background: #0088ff88;
+    padding: 8px 12px;
+    border-radius: 12px;
+    font-weight: 600;
+    color: #111;
+    user-select: none;
+    font-family: monospace;
+  }
+</style>
+</head>
+<body>
+
+<header id="logo" tabindex="0" aria-label="Lions Gate Fan Portal Logo">
+  <span class="logo-glow">LIONS GATE FAN PORTAL</span>
+</header>
+
+<button id="modeToggle" class="mode-toggle" aria-label="Toggle Theme">Toggle Mode</button>
+
+<div id="app">
+
+  <!-- Login Modal -->
+  <div id="adminLoginModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="adminLoginTitle">
+    <div class="modal">
+      <h2 id="adminLoginTitle">Admin Login</h2>
+      <label for="adminUser">Username</label>
+      <input type="text" id="adminUser" autocomplete="username" />
+      <label for="adminPass">Password</label>
+      <input type="password" id="adminPass" autocomplete="current-password" />
+      <button id="adminLoginBtn">Login</button>
+      <button id="adminCancelBtn" style="margin-left:10px;">Cancel</button>
+      <p id="adminLoginError" style="color:#f66;display:none;">Invalid credentials</p>
+    </div>
+  </div>
+
+  <!-- Admin Panel -->
+  <section id="adminPanel" class="glass-panel hidden" aria-label="Admin Dashboard">
+    <h2>Admin Dashboard</h2>
+    <button id="logoutBtn">Logout Admin</button>
+
+    <h3>Create User</h3>
+    <form id="createUserForm">
+      <label for="newUserName">Full Name</label>
+      <input type="text" id="newUserName" required />
+      <label for="newUserEmail">Email</label>
+      <input type="text" id="newUserEmail" required />
+      <label for="newUserProfilePic">Profile Picture</label>
+      <input type="file" id="newUserProfilePic" accept="image/*" />
+      <button type="submit">Create User & Generate Invite Link</button>
+    </form>
+    <p id="inviteLinkContainer" style="word-break: break-word;"></p>
+
+    <h3>Users</h3>
+    <div id="userList"></div>
+  </section>
+
+  <!-- Biometric + Auth Code Modal -->
+  <div id="bioModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="bioTitle">
+    <div class="modal" style="text-align:center;">
+      <h2 id="bioTitle">Biometric Authorization</h2>
+      <p>Place your thumb on the scanner below to begin scan</p>
+      <div id="scannerAnimation" style="margin:20px auto; width:100px; height:100px; border: 2px solid #0ff; border-radius:50%; position:relative; overflow:hidden;">
+        <div id="scannerBar" style="position:absolute; width:100%; height:20px; background:linear-gradient(90deg, transparent, #0ff, transparent); animation: scanAnim 4s linear;"></div>
+      </div>
+      <p id="bioScanStatus"></p>
+      <label for="authCodeInput">Enter Authorization Code</label>
+      <input type="text" id="authCodeInput" autocomplete="off" />
+      <button id="authCodeSubmitBtn">Submit Code</button>
+      <p id="authCodeError" style="color:#f66; display:none;">Invalid authorization code.</p>
+    </div>
+  </div>
+
+  <!-- Congratulations Modal -->
+  <div id="congratsModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="congratsTitle">
+    <div class="modal" style="text-align:center;">
+      <h2 id="congratsTitle">Congratulations!</h2>
+      <p>Your membership is authorized.</p>
+      <button id="goToFanPortalBtn">Go to Fan Portal</button>
+    </div>
+  </div>
+
+  <!-- Fan Portal -->
+  <section id="fanPortal" class="glass-panel hidden" aria-label="Fan Portal Main">
+    <h2>Welcome, <span id="fanUserName"></span>!</h2>
+    <div id="membershipCardContainer"></div>
+    <div class="xp-bar" aria-label="Experience Points">
+      <div class="xp-progress" id="xpProgress"></div>
+    </div>
+    <div id="badgeContainer"></div>
+
+    <h3>Fan Chatroom</h3>
+    <div class="chat-room" id="chatRoom" aria-live="polite"></div>
+    <input type="text" id="chatInput" placeholder="Write your message..." aria-label="Chat message input" />
+    <button id="sendChatBtn">Send</button>
+  </section>
+
+</div>
+
+<div class="voice-status" id="voiceStatus" aria-live="assertive" aria-atomic="true" style="display:none;"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+
+<script>
+(() => {
+  'use strict';
+
+  // Globals
+  const ADMIN_USERNAME = 'admin';
+  const ADMIN_PASSWORD = 'admin111';
+  const AUTH_CODE = 'L-26031998';
+
+  const app = document.getElementById('app');
+  const logo = document.getElementById('logo');
+  const adminLoginModal = document.getElementById('adminLoginModal');
+  const adminPanel = document.getElementById('adminPanel');
+  const fanPortal = document.getElementById('fanPortal');
+  const bioModal = document.getElementById('bioModal');
+  const congratsModal = document.getElementById('congratsModal');
+  const inviteLinkContainer = document.getElementById('inviteLinkContainer');
+
+  const adminUserInput = document.getElementById('adminUser');
+  const adminPassInput = document.getElementById('adminPass');
+  const adminLoginBtn = document.getElementById('adminLoginBtn');
+  const adminCancelBtn = document.getElementById('adminCancelBtn');
+  const adminLoginError = document.getElementById('adminLoginError');
+
+  const logoutBtn = document.getElementById('logoutBtn');
+  const createUserForm = document.getElementById('createUserForm');
+  const newUserName = document.getElementById('newUserName');
+  const newUserEmail = document.getElementById('newUserEmail');
+  const newUserProfilePic = document.getElementById('newUserProfilePic');
+  const userList = document.getElementById('userList');
+
+  const scannerAnimation = document.getElementById('scannerAnimation');
+  const bioScanStatus = document.getElementById('bioScanStatus');
+  const authCodeInput = document.getElementById('authCodeInput');
+  const authCodeSubmitBtn = document.getElementById('authCodeSubmitBtn');
+  const authCodeError = document.getElementById('authCodeError');
+
+  const goToFanPortalBtn = document.getElementById('goToFanPortalBtn');
+
+  const fanUserName = document.getElementById('fanUserName');
+  const membershipCardContainer = document.getElementById('membershipCardContainer');
+  const xpProgress = document.getElementById('xpProgress');
+  const badgeContainer = document.getElementById('badgeContainer');
+
+  const chatRoom = document.getElementById('chatRoom');
+  const chatInput = document.getElementById('chatInput');
+  const sendChatBtn = document.getElementById('sendChatBtn');
+
+  const modeToggle = document.getElementById('modeToggle');
+  const voiceStatus = document.getElementById('voiceStatus');
+
+  // State
+  let clickCount = 0;
+  let adminLoggedIn = false;
+  let users = JSON.parse(localStorage.getItem('lgUsers') || '[]');
+  let currentUser = null;
+  let chatMessages = JSON.parse(localStorage.getItem('lgChat') || '[]');
+
+  // Voice assistant setup (simple text announcements)
+  function voiceSpeak(text) {
+    voiceStatus.textContent = text;
+    voiceStatus.style.display = 'block';
+    setTimeout(() => {
+      voiceStatus.style.display = 'none';
+    }, 3000);
+  }
+
+  // Theme Mode Handling
+  function toggleMode() {
+    if(document.body.classList.contains('dark-mode')){
+      document.body.classList.remove('dark-mode');
+      document.body.style.background = '#fff';
+      document.body.style.color = '#222';
+      modeToggle.style.borderColor = '#0088ff';
+      modeToggle.style.color = '#0088ff';
+      voiceSpeak('Light mode activated');
+    } else {
+      document.body.classList.add('dark-mode');
+      document.body.style.background = '#111';
+      document.body.style.color = '#eee';
+      modeToggle.style.borderColor = '#0ff';
+      modeToggle.style.color = '#0ff';
+      voiceSpeak('Dark mode activated');
+    }
+  }
+  modeToggle.onclick = toggleMode;
+
+  // Logo click logic - reveal admin login modal after 3 clicks
+  logo.addEventListener('click', () => {
+    clickCount++;
+    if(clickCount === 3){
+      if(adminLoggedIn){
+        showAdminPanel();
+      } else {
+        showAdminLogin();
+      }
+      clickCount = 0;
+    }
+  });
+
+  // Admin login handlers
+  function showAdminLogin() {
+    adminLoginModal.classList.remove('hidden');
+    adminUserInput.value = '';
+    adminPassInput.value = '';
+    adminLoginError.style.display = 'none';
+    adminUserInput.focus();
+  }
+  function hideAdminLogin() {
+    adminLoginModal.classList.add('hidden');
+  }
+
+  adminLoginBtn.onclick = () => {
+    const username = adminUserInput.value.trim();
+    const password = adminPassInput.value.trim();
+    if(username === ADMIN_USERNAME && password === ADMIN_PASSWORD){
+      adminLoggedIn = true;
+      hideAdminLogin();
+      showAdminPanel();
+      voiceSpeak('Admin logged in successfully');
+    } else {
+      adminLoginError.style.display = 'block';
+      voiceSpeak('Invalid admin credentials');
+    }
+  };
+  adminCancelBtn.onclick = () => {
+    hideAdminLogin();
+  };
+
+  // Show admin panel
+  function showAdminPanel() {
+    adminPanel.classList.remove('hidden');
+    fanPortal.classList.add('hidden');
+    renderUserList();
+  }
+  // Hide admin panel
+  function hideAdminPanel() {
+    adminPanel.classList.add('hidden');
+  }
+
+  // Logout admin
+  logoutBtn.onclick = () => {
+    adminLoggedIn = false;
+    hideAdminPanel();
+    voiceSpeak('Admin logged out');
+  };
+
+  // User list rendering
+  function renderUserList() {
+    if(users.length === 0){
+      userList.innerHTML = '<p>No users created yet.</p>';
+      return;
+    }
+    userList.innerHTML = '';
+    users.forEach((u,i) => {
+      const div = document.createElement('div');
+      div.style.marginBottom = '15px';
+      div.innerHTML = `
+        <strong>${u.name}</strong> (${u.email})<br/>
+        XP: ${u.xp || 0} | Badges: ${u.badges ? u.badges.length : 0}<br/>
+        <button data-index="${i}" class="editXPBtn">Add XP</button>
+        <button data-index="${i}" class="addBadgeBtn">Add Badge</button>
+      `;
+      userList.appendChild(div);
+    });
+
+    // Add XP event
+    userList.querySelectorAll('.editXPBtn').forEach(btn => {
+      btn.onclick = e => {
+        const idx = e.target.getAttribute('data-index');
+        const xpToAdd = prompt('Enter XP to add:', '10');
+        const xpNum = Number(xpToAdd);
+        if(!isNaN(xpNum) && xpNum > 0){
+          users[idx].xp = (users[idx].xp || 0) + xpNum;
+          saveUsers();
+          renderUserList();
+          voiceSpeak(`Added ${xpNum} XP to ${users[idx].name}`);
+        }
+      }
+    });
+    // Add badge event
+    userList.querySelectorAll('.addBadgeBtn').forEach(btn => {
+      btn.onclick = e => {
+        const idx = e.target.getAttribute('data-index');
+        const badgeName = prompt('Enter badge name:', 'Super Fan');
+        if(badgeName && badgeName.trim() !== ''){
+          users[idx].badges = users[idx].badges || [];
+          users[idx].badges.push(badgeName.trim());
+          saveUsers();
+          renderUserList();
+          voiceSpeak(`Added badge "${badgeName}" to ${users[idx].name}`);
+        }
+      }
+    });
+  }
+
+  // Save users to localStorage
+  function saveUsers(){
+    localStorage.setItem('lgUsers', JSON.stringify(users));
+  }
+
+  // Create User Form submit
+  createUserForm.onsubmit = async e => {
+    e.preventDefault();
+    const name = newUserName.value.trim();
+    const email = newUserEmail.value.trim();
+    if(!name || !email){
+      alert('Please fill name and email.');
+      return;
+    }
+    let picData = '';
+    if(newUserProfilePic.files && newUserProfilePic.files[0]){
+      picData = await readFileAsDataURL(newUserProfilePic.files[0]);
+    }
+    // Create user object
+    const newUser = {
+      id: Date.now().toString(),
+      name,
+      email,
+      picData,
+      xp: 0,
+      badges: [],
+    };
+    users.push(newUser);
+    saveUsers();
+    renderUserList();
+    createUserForm.reset();
+
+    // Generate invite link
+    const inviteLink = `${location.origin}${location.pathname}?invite=${newUser.id}`;
+    inviteLinkContainer.textContent = `Invite link for ${name}: ${inviteLink}`;
+    voiceSpeak(`User ${name} created. Invite link generated.`);
+  };
+
+  // File reader helper
+  function readFileAsDataURL(file){
+    return new Promise((res, rej) => {
+      const reader = new FileReader();
+      reader.onload = () => res(reader.result);
+      reader.onerror = () => rej('File read error');
+      reader.readAsDataURL(file);
+    });
+  }
+
+  // Check if user opened invite link
+  function getQueryParam(param) {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get(param);
+  }
+  function findUserById(id) {
+    return users.find(u => u.id === id);
+  }
+
+  // Show biometric modal for authorization
+  function showBioModal(user){
+    bioModal.classList.remove('hidden');
+    bioScanStatus.textContent = '';
+    authCodeInput.value = '';
+    authCodeError.style.display = 'none';
+    authCodeInput.disabled = true;
+    authCodeSubmitBtn.disabled = true;
+
+    // Start biometric scan simulation
+    voiceSpeak('Starting biometric scan...');
+    let progress = 0;
+    bioScanStatus.textContent = 'Scanning... 0%';
+    const scanInterval = setInterval(() => {
+      progress += 10;
+      bioScanStatus.textContent = `Scanning... ${progress}%`;
+      if(progress >= 100){
+        clearInterval(scanInterval);
+        bioScanStatus.textContent = 'Scan complete! Please enter authorization code.';
+        authCodeInput.disabled = false;
+        authCodeSubmitBtn.disabled = false;
+        authCodeInput.focus();
+        voiceSpeak('Biometric scan complete, enter authorization code');
+      }
+    }, 300);
+  }
+
+  // Handle auth code submission
+  authCodeSubmitBtn.onclick = () => {
+    const code = authCodeInput.value.trim();
+    if(code === AUTH_CODE){
+      authCodeError.style.display = 'none';
+      bioModal.classList.add('hidden');
+      showCongratsModal();
+      voiceSpeak('Authorization successful');
+    } else {
+      authCodeError.style.display = 'block';
+      voiceSpeak('Invalid authorization code');
+    }
+  };
+
+  // Show congratulations modal
+  function showCongratsModal(){
+    congratsModal.classList.remove('hidden');
+  }
+  goToFanPortalBtn.onclick = () => {
+    congratsModal.classList.add('hidden');
+    showFanPortal(currentUser);
+  };
+
+  // Show fan portal
+  function showFanPortal(user){
+    if(!user) return;
+    fanUserName.textContent = user.name;
+    adminPanel.classList.add('hidden');
+    fanPortal.classList.remove('hidden');
+    membershipCardContainer.innerHTML = `
+      <p><strong>Name:</strong> ${user.name}</p>
+      <p><strong>Email:</strong> ${user.email}</p>
+      <p><strong>XP:</strong> ${user.xp || 0}</p>
+    `;
+    xpProgress.style.width = `${Math.min((user.xp || 0),100)}%`;
+
+    badgeContainer.innerHTML = '';
+    if(user.badges && user.badges.length > 0){
+      user.badges.forEach(badge => {
+        const span = document.createElement('span');
+        span.textContent = badge;
+        span.style.marginRight = '8px';
+        span.style.padding = '4px 8px';
+        span.style.backgroundColor = '#ffcc00';
+        span.style.borderRadius = '4px';
+        badgeContainer.appendChild(span);
+      });
+    }
+
+    renderChat();
+  }
+
+  // Render chat messages
+  function renderChat(){
+    chatRoom.innerHTML = '';
+    chatMessages.forEach(msg => {
+      const div = document.createElement('div');
+      div.textContent = `${msg.sender}: ${msg.text}`;
+      div.style.padding = '4px 8px';
+      div.style.marginBottom = '4px';
+      div.style.borderRadius = '4px';
+      if(msg.sender === currentUser.name){
+        div.style.backgroundColor = '#cce5ff';
+        div.style.textAlign = 'right';
+      } else {
+        div.style.backgroundColor = '#e2e2e2';
+        div.style.textAlign = 'left';
+      }
+      chatRoom.appendChild(div);
+    });
+    chatRoom.scrollTop = chatRoom.scrollHeight;
+  }
+
+  // Send chat message
+  sendChatBtn.onclick = () => {
+    const text = chatInput.value.trim();
+    if(text === '') return;
+    const msg = {
+      sender: currentUser.name,
+      text,
+      timestamp: Date.now()
+    };
+    chatMessages.push(msg);
+    localStorage.setItem('lgChat', JSON.stringify(chatMessages));
+    renderChat();
+    chatInput.value = '';
+  };
+
+  // Initialize app
+  function init() {
+    const inviteId = getQueryParam('invite');
+    if(inviteId){
+      currentUser = findUserById(inviteId);
+      if(currentUser){
+        showBioModal(currentUser);
+      }
+    }
+  }
+
+  init();
+
+})();  
+</script>
+</body>
+</html>
